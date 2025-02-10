@@ -36,5 +36,5 @@ This project is open-source and welcomes contributions! Find issues to tackle an
 
 * Node.js
 * Mozilla's Readability
-* node-html-arkdown
+* node-html-markdown
 * yargs

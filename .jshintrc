@@ -1,0 +1,6 @@
+{
+  "esversion": 8,
+  "globals": {
+    "fetch": true
+  }
+}

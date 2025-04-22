@@ -22,9 +22,9 @@ async function fetchUrlText(url) {
     return text;
 }
 
-function extractArticle(docURL, docText) {
-    const doc = new JSDOM(docText, {
-        url: docURL
+function extractArticle({url, text}) {
+    const doc = new JSDOM(text, {
+        url: url
     });
 
     const reader = new Readability(doc.window.document);
@@ -32,8 +32,9 @@ function extractArticle(docURL, docText) {
     return article;
 }
 
+
 async function main() {
-    const args = yargs(hideBin(process.argv)).scriptName("webread").parse();
+    const args = yargs(hideBin(process.argv)).scriptName("webread").boolean("json").parse();
     if (args._.length !== 1) {
         console.error('Please provide a single URL as an argument.');
         process.exit(1);
@@ -41,12 +42,17 @@ async function main() {
 
     const inputUrl = args._[0];
 
-    const content = await fetchUrlText(inputUrl);
-    const article = extractArticle(inputUrl, content);
+    const urlContent = await fetchUrlText(inputUrl);
+    const article = extractArticle({url: inputUrl, text: urlContent});
+    const content = NodeHtmlMarkdown.translate(article.content);
 
-    const markdown = NodeHtmlMarkdown.translate(article.content);
-
-    const output = `# ${article.title}\n\n${markdown}`;
+    var output = '';
+    if (args.json) {
+        output = JSON.stringify({'title': article.title, 'content': content});
+    }
+    else {
+        output = `# ${article.title}\n\n${content}`;
+    }
     console.log(output);
 
     process.exit(0);
